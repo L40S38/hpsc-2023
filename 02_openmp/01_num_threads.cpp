@@ -1,5 +1,6 @@
 #include <iostream>
-#include <omp.h>
+#include <omp.h> 
+/*this is needed to call omp_set_num_threads*/
 
 int main() {
   omp_set_num_threads(3);
