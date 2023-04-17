@@ -8,6 +8,7 @@ int fib(int n) {
 #pragma omp task shared(j)
   j = fib(n-2);
 #pragma omp taskwait
+  //printf("%d %d\n",i,j);
   return i+j;
 }
 

@@ -16,22 +16,25 @@ void merge(std::vector<int>& vec, int begin, int mid, int end) {
     else
       tmp[i] = vec[right++]; 
   }
+#pragma omp parallel for schedule(dynamic)
   for (int i=0; i<tmp.size(); i++) 
-    vec[begin++] = tmp[i];
+    vec[begin+i] = tmp[i];
 }
 
 void merge_sort(std::vector<int>& vec, int begin, int end) {
   if(begin < end) {
     int mid = (begin + end) / 2;
-    merge_sort(vec, begin, mid);
-    merge_sort(vec, mid+1, end);
+    merge_sort(vec, begin, mid);//left sort
+    merge_sort(vec, mid+1, end);//right sort
     merge(vec, begin, mid, end);
   }
 }
 
 int main() {
   int n = 20;
+  //initialize array
   std::vector<int> vec(n);
+#pragma omp parallel for schedule(dynamic)
   for (int i=0; i<n; i++) {
     vec[i] = rand() % (10 * n);
     printf("%d ",vec[i]);
