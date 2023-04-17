@@ -24,8 +24,11 @@ void merge(std::vector<int>& vec, int begin, int mid, int end) {
 void merge_sort(std::vector<int>& vec, int begin, int end) {
   if(begin < end) {
     int mid = (begin + end) / 2;
+#pragma omp task shared(vec)
     merge_sort(vec, begin, mid);//left sort
+#pragma omp task shared(vec)
     merge_sort(vec, mid+1, end);//right sort
+#pragma omp taskwait
     merge(vec, begin, mid, end);
   }
 }
