@@ -11,6 +11,7 @@ int main() {
   printf("\n");
 #pragma omp parallel
   for(int j=1; j<N; j<<=1) {
+    printf("j=%d\n",j);
 #pragma omp for
     for(int i=0; i<N; i++)
       b[i] = a[i];
