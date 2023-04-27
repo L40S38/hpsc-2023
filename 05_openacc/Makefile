@@ -2,6 +2,8 @@
 	nvc++ 00_loop.cpp -acc -Minfo
 01_gang: 01_gang.cpp
 	nvc++ 01_gang.cpp -acc -Minfo
+01_gang_kernel: 01_gang_kernel.cpp
+	nvc++ 01_gang_kernel.cpp -acc -Minfo
 02_parallel: 02_parallel.cpp
 	nvc++ 02_parallel.cpp -acc -Minfo
 03_kernels: 03_kernels.cpp
