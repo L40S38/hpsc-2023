@@ -24,5 +24,6 @@
 	nvcc 11_mpi.cu -lmpi
 12_hip: 12_hip.cpp
 	hipcc 12_hip.cpp
-13_bucket_sort: 13_bucket_sort.cpp
-	g++ 13_bucket_sort.cpp
+13_bucket_sort: 13_bucket_sort.cu
+#	g++ 13_bucket_sort.cpp
+	nvcc 03_bucket_sort.cu
