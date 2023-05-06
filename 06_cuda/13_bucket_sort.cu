@@ -1,19 +1,19 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
-__global__ void zero_init(int *array){
+__global__ void zero_init(int *array){/*ゼロ初期化*/
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   array[i] = 0;
   __syncthreads();
 }
 
-__global__ void reduction_add(int *array,int *key){
+__global__ void reduction_add(int *array,int *key){/*加算のためのreduction*/
   int i = threadIdx.x;
   int j = blockIdx.x;
   if(key[i]==j)atomicAdd(&array[j],1);
 }
 
-__global__ void scan(int *a, int *b, int range) {
+__global__ void scan(int *a, int *b, int range) {/*prefix sumのための関数*/
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   for(int j=1; j<range; j<<=1) {
     b[i] = a[i];
@@ -27,7 +27,7 @@ __global__ void scan(int *a, int *b, int range) {
   else a[i]=b[i-1];
 }
 
-__global__ void sort(int *offset, int *key, int N) {
+__global__ void sort(int *offset, int *key, int N) {/*bucket sort*/
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   int begin,end;
   if(i==0)begin=0;
@@ -44,6 +44,7 @@ int main() {
   int n = 50;
   int range = 5;
   int *key,*bucket,*offset;
+  /*メモリ確保*/
   cudaMallocManaged(&key, n*sizeof(int));
   cudaMallocManaged(&bucket, range*sizeof(int));
   cudaMallocManaged(&offset, range*sizeof(int));
