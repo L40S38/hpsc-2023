@@ -42,11 +42,12 @@ void plotData(const vector<vector<double>>& x, const vector<vector<double>>& y,
         fprintf(gnuplotPipe, "set ylabel 'Y'\n");
         fprintf(gnuplotPipe, "plot 'data.txt' u 1:2:(sqrt($4*$4+$5*$5)) with vectors title 'Velocity'\n");
         fflush(gnuplotPipe);
-        fprintf(gnuplotPipe, "exit\n");
-        pclose(gnuplotPipe);
+        //fprintf(gnuplotPipe, "exit\n");
+        //pclose(gnuplotPipe);
     } else {
         cerr << "Failed to open gnuplot pipe." << endl;
     }
+    pclose(gnuplotPipe);
 }
 
 int main() {
