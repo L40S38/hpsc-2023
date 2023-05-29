@@ -202,7 +202,7 @@ int main(void){
         fprintf(gnuplotPipe, "set yrange [0:2]\n");
         fprintf(gnuplotPipe, "set ylabel 'y'\n");
         fprintf(gnuplotPipe, "set cbrange [-0.6:0.6]\n");
-        fprintf(gnuplotPipe, "set palette maxcolors 24\n");
+        fprintf(gnuplotPipe, "set palette maxcolors 60\n");
         fprintf(gnuplotPipe, "set isosamples 50\n");
         fprintf(gnuplotPipe, "set palette defined (-0.6 'blue', 0 'white', 0.6 'red')\n");
         fprintf(gnuplotPipe, "set nokey\n");
