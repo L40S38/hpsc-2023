@@ -1,3 +1,5 @@
+//#pragma execution_character_set("utf-8")
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -8,6 +10,7 @@
 const int nx = 41;
 const int ny = 41;
 const int nt = 500;
+//const int nt = 10;
 const int nit = 50;
 const double dx = 2.0 / (nx - 1);
 const double dy = 2.0 / (ny - 1);
@@ -16,35 +19,38 @@ const double rho = 1.0;
 const double nu = 0.02;
 
 // プロットデータをファイルに保存する関数
-void saveDataPressure(const std::vector<std::vector<double>>& data, const std::string& filename) {
-    FILE* fp = fopen(filename.c_str(), "w");
+void sendDataPressure(const std::vector<double>& x, const std::vector<double>& y,
+                        const std::vector<std::vector<double>>& p, FILE* fp) {
+    //FILE* fp = fopen(filename.c_str(), "w", "utf-8");
     if (fp != nullptr) {
         for (int i = 0; i < ny; i++) {
             for (int j = 0; j < nx; j++) {
-                fprintf(fp, "%f ", data[i][j]);
+                fprintf(fp, "%f %f %f\n", x[j], y[i], p[i][j]);
             }
-            fprintf(fp, "\n");
+            //fprintf(fp,"\n");
         }
-        fclose(fp);
+        fprintf(fp, "e\n");
+        //fclose(fp);
     } else {
-        std::cerr << "Failed to open file: " << filename << std::endl;
+        //std::cerr << "Failed to open file: " << filename << std::endl;
+        std::cerr << "Failed to open file" << std::endl;
     }
 }
 
-void saveDataVerocity(const std::vector<double>& x, const std::vector<double>& y,
+void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y,
                         const std::vector<std::vector<double>>& u, const std::vector<std::vector<double>>& v,
-                        const std::string& filename) {
-    FILE* fp = fopen(filename.c_str(), "w");
+                        FILE* fp) {
+    //FILE* fp = fopen(filename.c_str(), "w");
     if (fp != nullptr) {
-        for (int i = 0; i < ny; i++) {
-            for (int j = 0; j < nx; j++) {
-                fprintf(fp, "%f %f %f %f", x[i], y[j], u[i][j], v[i][j]);
+        for (int i = 1; i < ny; i = i+2) {
+            for (int j = 1; j < nx; j = j+2) {
+                fprintf(fp, "%f %f %f %f\n", x[j], y[i], u[i][j]*0.5, v[i][j]*0.5);
             }
-            fprintf(fp, "\n");
         }
-        fclose(fp);
+        fprintf(fp, "e\n");
+        //fclose(fp);
     } else {
-        std::cerr << "Failed to open file: " << filename << std::endl;
+        std::cerr << "Failed to open file" << std::endl;
     }
 }
 
@@ -110,6 +116,7 @@ int main(void){
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     initialize(u, v, p, b);
+    char imageNumPath[200];
 
     // gnuplotのパイプラインの作成
     FILE* gnuplotPipe = popen("gnuplot -persist", "w");
@@ -169,10 +176,12 @@ int main(void){
         border(u,v);
 
         // プロットデータをファイルに保存
-        saveDataPressure(p, "pressure.dat");
+        //saveDataPressure(x,y,p, "pressure.dat");
+        //saveDataPressure(x,y,p, "pressure/pressure"+std::to_string(n)+".dat");
         //saveData(u, "velocity_u.dat");
         //saveData(v, "velocity_v.dat");
-        saveDataVerocity(x,y,u,v, "verosity.dat");
+        //saveDataVerocity(x,y,u,v, "verosity.dat");
+        //saveDataPressure(x,y,p, "verosity/verosity"+std::to_string(n)+".dat");
         /*
         plt.contourf(X, Y, p, alpha=0.5, cmap=plt.cm.coolwarm)
         plt.quiver(X[::2, ::2], Y[::2, ::2], u[::2, ::2], v[::2, ::2])
@@ -181,15 +190,29 @@ int main(void){
         */
 
         // gnuplotにプロットコマンドを送信
-        //fprintf(gnuplotPipe, "set title 'Pressure'\n");
+        fprintf(gnuplotPipe, "set title 'Pressure'\n");
+        //fprintf(gnuplotPipe, "set autoscale fix\n");
+        fprintf(gnuplotPipe, "set contour s\n");
+        fprintf(gnuplotPipe, "set surface\n");
+        fprintf(gnuplotPipe, "set pm3d map nohidden3d\n");
+        //fprintf(gnuplotPipe, "set view map\n");
+        fprintf(gnuplotPipe, "set pm3d interpolate 25,25\n");
         fprintf(gnuplotPipe, "set xrange [0:2]\n");
+        fprintf(gnuplotPipe, "set xlabel 'x'\n");
         fprintf(gnuplotPipe, "set yrange [0:2]\n");
-        fprintf(gnuplotPipe, "set isosamples 1000\n");
-        fprintf(gnuplotPipe, "set view map\n");
-        fprintf(gnuplotPipe, "set pm3d interpolate 15,15\n");
-        //fprintf(gnuplotPipe, "set cbrange [-1.0:1.0]\n");
-        fprintf(gnuplotPipe, "splot 'pressure.dat' matrix with pm3d\n");
-        //fprintf(gnuplotPipe, "plot 'verosity.dat' u 1:2:3:4  with vector\n");
+        fprintf(gnuplotPipe, "set ylabel 'y'\n");
+        fprintf(gnuplotPipe, "set cbrange [-0.6:0.6]\n");
+        fprintf(gnuplotPipe, "set palette maxcolors 24\n");
+        fprintf(gnuplotPipe, "set isosamples 50\n");
+        fprintf(gnuplotPipe, "set palette defined (-0.6 'blue', 0 'white', 0.6 'red')\n");
+        fprintf(gnuplotPipe, "set nokey\n");
+        //fprintf(gnuplotPipe, "set datafile separator\n");
+        //sprintf(imageNumPath, "set output 'image/image%d.png'\n", n);
+        //fprintf(gnuplotPipe, "set terminal png\n");
+        //fprintf(gnuplotPipe,  imageNumPath);
+        fprintf(gnuplotPipe, "plot '-' u 1:2:3 with image, '-' with vector lc black\n");
+        sendDataPressure(x, y, p, gnuplotPipe);
+        sendDataVerocity(x, y, u, v, gnuplotPipe);
         fprintf(gnuplotPipe, "pause .01\n");
         fflush(gnuplotPipe);
 
