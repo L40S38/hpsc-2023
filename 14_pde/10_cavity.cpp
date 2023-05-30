@@ -123,6 +123,11 @@ int main(void){
     if (gnuplotPipe == nullptr) {
         std::cerr << "Failed to open gnuplot pipe." << std::endl;
         return 1;
+    } else {
+        // git animate settings
+        fprintf(gnuplotPipe, "reset\n");
+        //fprintf(gnuplotPipe, "set terminal gif animate\n");
+        //fprintf(gnuplotPipe, "set output '10_cavity.gif'\n");
     }
 
     for(int n=0; n<nt; n++){
@@ -214,6 +219,7 @@ int main(void){
         sendDataPressure(x, y, p, gnuplotPipe);
         sendDataVerocity(x, y, u, v, gnuplotPipe);
         fprintf(gnuplotPipe, "pause .01\n");
+        fprintf(gnuplotPipe, "\n\n");
         fflush(gnuplotPipe);
 
         // 一時停止
