@@ -115,7 +115,7 @@ int main(void){
     std::vector<std::vector<double>> v(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
-    initialize(u, v, p, b);
+    initialize<<<ny,nx>>>(u, v, p, b);
     std::chrono::steady_clock::time_point tic, toc;
     double time;
 
