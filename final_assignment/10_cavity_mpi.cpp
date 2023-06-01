@@ -107,6 +107,7 @@ int main(int argc, char** argv){
     std::vector<std::vector<double>> v(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
+    std::vector<std::vector<double>> pn(ny, std::vector<double>(nx));
     initialize(u, v, p, b);
     std::chrono::steady_clock::time_point tic, toc;
     int size,rank;
@@ -145,7 +146,7 @@ int main(int argc, char** argv){
         }
         //for(int it=0; it<nit; it++){
         for(int it=begin; it<end; it++)
-            std::vector<std::vector<double>> pn = p;
+            pn = p;
             for(int j=1; j<ny-1; j++){
                 for(int i=1; i<nx-1; i++){
                     p[j][i] =
