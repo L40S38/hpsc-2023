@@ -64,14 +64,12 @@ void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y
 
 //境界条件
 void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v) {
-#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         u[0][i] = 0.0;
         u[ny - 1][i] = 1.0;
         v[0][i] = 0.0;
         v[ny - 1][i] = 0.0;
     }
-#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         u[i][0] = 0.0;
         u[i][nx - 1] = 0.0;
@@ -97,11 +95,9 @@ int main(void){
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
-#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         x[i] = i * dx;
     }
-#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         y[i] = i * dy;
     }
