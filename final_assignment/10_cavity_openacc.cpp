@@ -64,14 +64,14 @@ void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y
 
 //境界条件
 void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v) {
-#pragma acc parallel
+#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         u[0][i] = 0.0;
         u[ny - 1][i] = 1.0;
         v[0][i] = 0.0;
         v[ny - 1][i] = 0.0;
     }
-#pragma acc parallel
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         u[i][0] = 0.0;
         u[i][nx - 1] = 0.0;
@@ -83,7 +83,7 @@ void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>
 // 初期条件の設定
 void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
                 std::vector<std::vector<double>>& p, std::vector<std::vector<double>>& b) {
-#pragma acc parallel
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
             u[i][j] = 0.0;
@@ -91,20 +91,6 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             p[i][j] = 0.0;
             b[i][j] = 0.0;
         }
-    }
-#pragma acc parallel
-    for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 0.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
-    }
-#pragma acc parallel
-    for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
     }
 }
 
@@ -159,6 +145,7 @@ int main(void){
 #pragma acc parallel loop
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
+#pragma acc parallel loop
             for(int j=1; j<ny-1; j++){
                 for(int i=1; i<nx-1; i++){
                     p[j][i] =
@@ -168,10 +155,12 @@ int main(void){
                         (2 * (dxdx + dydy));
                 }
             }
+#pragma acc parallel loop
             for (int i = 0; i < nx; i++) {
                 p[0][i] = p[1][i];
                 p[ny - 1][i] = 0.0;
             }
+#pragma acc parallel loop
             for (int i = 0; i < ny; i++) {
                 p[i][0] = p[i][1];
                 p[i][nx - 1] = p[i][nx - 2];
