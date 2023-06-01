@@ -220,9 +220,11 @@ int main(int argc, char** argv){
         std::cout << n + 1 << "," << time << std::endl;
     }
 
+    // MPIを閉じる
+    MPI_Finalize();
+
     // gnuplotパイプラインを閉じる
     pclose(gnuplotPipe);
-    MPI_Finalize();
 
     return 0;
 }
