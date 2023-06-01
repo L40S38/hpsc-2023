@@ -173,26 +173,26 @@ int main(int argc, char **argv)
         // for(int it=0; it<nit; it++){
         for (int it = begin; it < end; it++)
             pn = p;
-        for (int j = 1; j < ny - 1; j++)
-        {
-            for (int i = 1; i < nx - 1; i++)
+            for (int j = 1; j < ny - 1; j++)
             {
-                p[j][i] =
-                    (dydy * (pn[j][i + 1] + pn[j][i - 1]) +
-                     dxdx * (pn[j + 1][i] + pn[j - 1][i]) -
-                     b[j][i] * dxdx * dydy) /
-                    (2 * (dxdx + dydy));
+                for (int i = 1; i < nx - 1; i++)
+                {
+                    p[j][i] =(dydy * (pn[j][i + 1] + pn[j][i - 1]) +
+                            dxdx * (pn[j + 1][i] + pn[j - 1][i]) -
+                            b[j][i] * dxdx * dydy) /
+                        (2 * (dxdx + dydy));
+                }
             }
-        }
-        for (int i = 0; i < nx; i++)
-        {
-            p[0][i] = p[1][i];
-            p[ny - 1][i] = 0.0;
-        }
-        for (int i = 0; i < ny; i++)
-        {
-            p[i][0] = p[i][1];
-            p[i][nx - 1] = p[i][nx - 2];
+            for (int i = 0; i < nx; i++)
+            {
+                p[0][i] = p[1][i];
+                p[ny - 1][i] = 0.0;
+            }
+            for (int i = 0; i < ny; i++)
+            {
+                p[i][0] = p[i][1];
+                p[i][nx - 1] = p[i][nx - 2];
+            }
         }
 
         std::vector<std::vector<double>> un = u;
