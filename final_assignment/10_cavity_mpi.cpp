@@ -91,7 +91,7 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
     }
 }
 
-int main(void){
+int main(int argc, char** argv){
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
