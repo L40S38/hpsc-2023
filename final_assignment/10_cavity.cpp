@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <chrono>
+
 // グローバル変数
 const int nx = 41;
 const int ny = 41;
@@ -96,10 +98,6 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
 }
 
 int main(void){
-    /*
-    X, Y = np.meshgrid(x, y)
-    は実装する必要あるのか？
-    */
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
@@ -116,7 +114,8 @@ int main(void){
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     initialize(u, v, p, b);
-    char imageNumPath[200];
+    std::chrono::steady_clock::time_point tic, toc;
+    double time;
 
     // gnuplotのパイプラインの作成
     FILE* gnuplotPipe = popen("gnuplot -persist", "w");
@@ -131,6 +130,8 @@ int main(void){
     }
 
     for(int n=0; n<nt; n++){
+        //タイム計測
+        toc = std::chrono::steady_clock::now();
         for(int j=1; j<ny-1; j++){
             for(int i=1; i<nx-1; i++){
                 b[j][i] = rho * (1 / dt *
@@ -166,11 +167,10 @@ int main(void){
         for (int j=1; j<ny-1; j++) {
             for (int i=1; i<nx-1; i++) {
                 u[j][i] = un[j][i] - un[j][i] * dt / dx * (un[j][i] - un[j][i-1]) -
-                                    vn[j][i] * dt / dy * (un[j][i] - un[j-1][i]) -
+                                    un[j][i] * dt / dy * (un[j][i] - un[j-1][i]) -
                                     dt / (2 * rho * dx) * (p[j][i+1] - p[j][i-1]) +
                                     nu * dt / (dx * dx) * (un[j][i+1] - 2 * un[j][i] + un[j][i-1]) +
                                     nu * dt / (dy * dy) * (un[j+1][i] - 2 * un[j][i] + un[j-1][i]);
-
                 v[j][i] = vn[j][i] - vn[j][i] * dt / dx * (vn[j][i] - vn[j][i-1]) -
                                     vn[j][i] * dt / dy * (vn[j][i] - vn[j-1][i]) -
                                     dt / (2 * rho * dx) * (p[j+1][i] - p[j-1][i]) +
@@ -198,8 +198,10 @@ int main(void){
         fprintf(gnuplotPipe, "\n\n");
         fflush(gnuplotPipe);
 
-        // 一時停止
-        std::cout << "Step: " << n + 1 << " / " << nt << std::endl;
+        // 時間計測
+        tic = std::chrono::steady_clock::now();
+        time = std::chrono::duration<double>(tic-toc).count();
+        std::cout << n + 1 << "," << time << std::endl;
     }
 
     // gnuplotパイプラインを閉じる
