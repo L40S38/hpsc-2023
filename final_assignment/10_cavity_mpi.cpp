@@ -183,6 +183,16 @@ int main(void){
                                     nudt / (dydy) * (vn[j+1][i] - 2 * vn[j][i] + vn[j-1][i]);
                 /*
                 2 * rho * dx, nu * dt, dy * dy, dx * dx は先に計算しておいた方が良さそう
+                
+                こんな感じの計算ができればいいなのメモ
+                +1とか-1の部分をoffset?とか使って上手くloadできればいけそう
+
+                uvec = unvec - unvec * dt / dx * (unvec - un[j][i-1]) -
+                                    unvec * dt / dy * (unvec - un[j-1][i]) -
+                                    dt / (rhodx2) * (p[j][i+1] - p[j][i-1]) +
+                                    nudt / (dxdx) * (un[j][i+1] - 2 * unvec + un[j][i-1]) +
+                                    nudt / (dydy) * (un[j+1][i] - 2 * unvec + un[j-1][i]);
+                
                 */
             }
         }

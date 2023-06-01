@@ -63,12 +63,14 @@ void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y
 
 //境界条件
 void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v) {
+#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         u[0][i] = 0.0;
         u[ny - 1][i] = 1.0;
         v[0][i] = 0.0;
         v[ny - 1][i] = 0.0;
     }
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         u[i][0] = 0.0;
         u[i][nx - 1] = 0.0;
@@ -80,6 +82,7 @@ void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>
 // 初期条件の設定
 void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
                 std::vector<std::vector<double>>& p, std::vector<std::vector<double>>& b) {
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
             u[i][j] = 0.0;
@@ -88,12 +91,14 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             b[i][j] = 0.0;
         }
     }
+#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         u[0][i] = 0.0;
         u[ny - 1][i] = 0.0;
         v[0][i] = 0.0;
         v[ny - 1][i] = 0.0;
     }
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         u[i][0] = 0.0;
         u[i][nx - 1] = 0.0;
@@ -106,9 +111,11 @@ int main(void){
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
+#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         x[i] = i * dx;
     }
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         y[i] = i * dy;
     }
@@ -137,6 +144,7 @@ int main(void){
     for(int n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
+#pragma acc parallel loop
         for(int j=1; j<ny-1; j++){
             for(int i=1; i<nx-1; i++){
                 b[j][i] = rho * (1 / dt *
@@ -147,6 +155,7 @@ int main(void){
                                  ((v[j+1][i] - v[j-1][i]) / (2 * dy)) * ((v[j+1][i] - v[j-1][i]) / (2 * dy)));
             }
         }
+#pragma acc parallel loop
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
             for(int j=1; j<ny-1; j++){
@@ -158,10 +167,12 @@ int main(void){
                         (2 * (dxdx + dydy));
                 }
             }
+#pragma acc parallel loop
             for (int i = 0; i < nx; i++) {
                 p[0][i] = p[1][i];
                 p[ny - 1][i] = 0.0;
             }
+#pragma acc parallel loop
             for (int i = 0; i < ny; i++) {
                 p[i][0] = p[i][1];
                 p[i][nx - 1] = p[i][nx - 2];
@@ -169,6 +180,7 @@ int main(void){
         }
         std::vector<std::vector<double>> un = u;
         std::vector<std::vector<double>> vn = v;
+#pragma acc parallel loop
         for (int j=1; j<ny-1; j++) {
             for (int i=1; i<nx-1; i++) {
                 u[j][i] = un[j][i] - un[j][i] * dt / dx * (un[j][i] - un[j][i-1]) -
