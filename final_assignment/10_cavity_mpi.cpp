@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include <chrono>
+#include "mpi.h"
 
 // グローバル変数
 const int nx = 41;
@@ -88,18 +89,6 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             b[i][j] = 0.0;
         }
     }
-    for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 0.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
-    }
-    for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
-    }
 }
 
 int main(void){
@@ -120,6 +109,7 @@ int main(void){
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     initialize(u, v, p, b);
     std::chrono::steady_clock::time_point tic, toc;
+    int size,rank;
     double time;
 
     // gnuplotのパイプラインの作成
@@ -134,6 +124,12 @@ int main(void){
         //fprintf(gnuplotPipe, "set output '10_cavity.gif'\n");
     }
 
+    MPI_Init(&argc,&argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &rank);
+    int begin = rank * (nit/size);
+    int end = (rank+1) * (nit/size);
+
     for(int n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
@@ -147,7 +143,8 @@ int main(void){
                                  ((v[j+1][i] - v[j-1][i]) / (2 * dy)) * ((v[j+1][i] - v[j-1][i]) / (2 * dy)));
             }
         }
-        for(int it=0; it<nit; it++){
+        //for(int it=0; it<nit; it++){
+        for(int it=begin; it<end; it++)
             std::vector<std::vector<double>> pn = p;
             for(int j=1; j<ny-1; j++){
                 for(int i=1; i<nx-1; i++){
@@ -224,6 +221,7 @@ int main(void){
 
     // gnuplotパイプラインを閉じる
     pclose(gnuplotPipe);
+    MPI_Finalize();
 
     return 0;
 }

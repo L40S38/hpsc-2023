@@ -78,10 +78,9 @@ void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>
 }
 
 // 初期条件の設定
-__global__ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
+void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
                 std::vector<std::vector<double>>& p, std::vector<std::vector<double>>& b) {
     //block:ny個, thread:ny個と仮定
-    /*
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
             u[i][j] = 0.0;
@@ -90,13 +89,6 @@ __global__ void initialize(std::vector<std::vector<double>>& u, std::vector<std:
             b[i][j] = 0.0;
         }
     }
-    */
-    int i = threadIdx.x;
-    int j = blockIdx.x;
-    u[i][j] = 0.0;
-    v[i][j] = 0.0;
-    p[i][j] = 0.0;
-    b[i][j] = 0.0;
 }
 
 int main(void){
@@ -115,7 +107,6 @@ int main(void){
     std::vector<std::vector<double>> v(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
-    initialize<<<ny,nx>>>(u, v, p, b);
     std::chrono::steady_clock::time_point tic, toc;
     double time;
 
