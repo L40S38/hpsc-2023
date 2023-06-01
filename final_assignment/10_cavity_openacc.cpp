@@ -168,12 +168,10 @@ int main(void){
                         (2 * (dxdx + dydy));
                 }
             }
-#pragma acc parallel
             for (int i = 0; i < nx; i++) {
                 p[0][i] = p[1][i];
                 p[ny - 1][i] = 0.0;
             }
-#pragma acc parallel
             for (int i = 0; i < ny; i++) {
                 p[i][0] = p[i][1];
                 p[i][nx - 1] = p[i][nx - 2];
