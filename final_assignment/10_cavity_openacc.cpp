@@ -112,11 +112,11 @@ int main(void){
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
-#pragma acc parallel
+#pragma acc parallel loop
     for (int i = 0; i < nx; i++) {
         x[i] = i * dx;
     }
-#pragma acc parallel
+#pragma acc parallel loop
     for (int i = 0; i < ny; i++) {
         y[i] = i * dy;
     }
@@ -145,7 +145,7 @@ int main(void){
     for(int n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
-#pragma acc parallel
+#pragma acc parallel loop
         for(int j=1; j<ny-1; j++){
             for(int i=1; i<nx-1; i++){
                 b[j][i] = rho * (1 / dt *
@@ -156,7 +156,7 @@ int main(void){
                                  ((v[j+1][i] - v[j-1][i]) / (2 * dy)) * ((v[j+1][i] - v[j-1][i]) / (2 * dy)));
             }
         }
-#pragma acc parallel
+#pragma acc parallel loop
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
             for(int j=1; j<ny-1; j++){
@@ -179,7 +179,7 @@ int main(void){
         }
         std::vector<std::vector<double>> un = u;
         std::vector<std::vector<double>> vn = v;
-#pragma acc parallel
+#pragma acc parallel loop
         for (int j=1; j<ny-1; j++) {
             for (int i=1; i<nx-1; i++) {
                 u[j][i] = un[j][i] - un[j][i] * dt / dx * (un[j][i] - un[j][i-1]) -
