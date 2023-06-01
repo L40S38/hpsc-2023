@@ -110,7 +110,7 @@ int main(int argc, char** argv){
     std::vector<std::vector<double>> pn(ny, std::vector<double>(nx));
     initialize(u, v, p, b);
     std::chrono::steady_clock::time_point tic, toc;
-    int size,rank;
+    int size,rank,n;
     double time;
 
     // gnuplotのパイプラインの作成
@@ -131,7 +131,7 @@ int main(int argc, char** argv){
     int begin = rank * (nit/size);
     int end = (rank+1) * (nit/size);
 
-    for(int n=0; n<nt; n++){
+    for(n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
         for(int j=1; j<ny-1; j++){
