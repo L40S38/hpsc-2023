@@ -141,6 +141,7 @@ int main(void){
                                  ((v[j+1][i] - v[j-1][i]) / (2 * dy)) * ((v[j+1][i] - v[j-1][i]) / (2 * dy)));
             }
         }
+#pragma acc parallel loop
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
             for(int j=1; j<ny-1; j++){
