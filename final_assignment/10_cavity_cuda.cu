@@ -78,8 +78,10 @@ void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>
 }
 
 // 初期条件の設定
-void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
+__global__ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
                 std::vector<std::vector<double>>& p, std::vector<std::vector<double>>& b) {
+    //block:ny個, thread:ny個と仮定
+    /*
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
             u[i][j] = 0.0;
@@ -88,18 +90,13 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             b[i][j] = 0.0;
         }
     }
-    for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 0.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
-    }
-    for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
-    }
+    */
+    int i = threadIdx.x;
+    int j = blockIdx.x;
+    u[i][j] = 0.0;
+    v[i][j] = 0.0;
+    p[i][j] = 0.0;
+    b[i][j] = 0.0;
 }
 
 int main(void){
