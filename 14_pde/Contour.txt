@@ -1,4 +1,0 @@
-
-# Surface 0 of 1 surfaces
-
-# Curve title: "'Surface.txt' u 1:2:3"
