@@ -83,18 +83,6 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             b[i][j] = 0.0;
         }
     }
-    for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 0.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
-    }
-    for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
-    }
 }
 
 int main(void){
