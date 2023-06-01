@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include <chrono>
+#include <openacc.h>
 
 // グローバル変数
 const int nx = 41;
