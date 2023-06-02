@@ -120,7 +120,10 @@ int main(void){
     for(int n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
+#pragma acc kernels
+#pragma acc loop independent
         for(int j=1; j<ny-1; j++){
+#pragma acc loop independent
             for(int i=1; i<nx-1; i++){
                 b[j][i] = rho * (1 / dt *
                                  ((u[j][i+1] - u[j][i-1]) / (2 * dx) + (v[j+1][i] - v[j-1][i]) / (2 * dy)) -
