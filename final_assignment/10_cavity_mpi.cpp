@@ -171,6 +171,7 @@ int main(int argc, char **argv)
             }
         }
         // for(int it=0; it<nit; it++){
+        std::cout << "rank:" << rank << ",size:" << size << ",begin:" << begin << ",end:" << end << std::endl;
         for (int it = begin; it < end; it++)
         {
             pn = p;
