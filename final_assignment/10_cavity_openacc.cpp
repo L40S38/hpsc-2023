@@ -136,10 +136,10 @@ int main(void){
         }
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
-#pragma acc kernels
-#pragma acc loop independent
+//#pragma acc kernels
+//#pragma acc loop independent
             for(int j=1; j<ny-1; j++){
-#pragma acc loop independent
+//#pragma acc loop independent
                 for(int i=1; i<nx-1; i++){
                     p[j][i] =
                         (dy * dy * (pn[j][i+1] + pn[j][i-1]) +
