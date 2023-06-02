@@ -19,6 +19,6 @@ cuda:10_cavity_cuda.cu
 openacc:10_cavity_openacc.cpp
 	module purge
 	module load nvhpc/22.2
-	nvc++ 00_loop.cpp -acc
-	nvc++ 00_loop.cpp -acc -Minfo
+	nvc++ 10_cavity_openacc.cpp -acc
+	nvc++ 10_cavity_openacc.cpp -acc -Minfo
 	./a.out
