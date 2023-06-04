@@ -20,6 +20,11 @@ const double dy = 2.0 / (ny - 1);
 const double dt = 0.01;
 const double rho = 1.0;
 const double nu = 0.02;
+// 先に計算しておいた方がいい値リスト
+const double rhodx2 = 2 * rho * dx;
+const double nudt = nu * dt;
+const double dydy = dy * dy;
+const double dxdx = dx * dx;
 
 // プロットデータをファイルに保存する関数
 void sendDataPressure(const std::vector<double>& x, const std::vector<double>& y,
