@@ -20,7 +20,7 @@ const double dt = 0.01;
 const double rho = 1.0;
 const double nu = 0.02;
 
-double *u, *v, *p, *b, *pn, *un, *vn;
+double *u, *v, *p, *b, *un, *vn;
 
 #define u(y,x) u[(y)*ny + (x)]
 #define v(y,x) v[(y)*ny + (x)]
@@ -115,7 +115,7 @@ void free_memories(double *u, double *v, double *p, double *b,
     cudaFree(v);
     cudaFree(p);
     cudaFree(b);
-    cudaFree(pn);
+    //cudaFree(pn);
     cudaFree(un);
     cudaFree(vn);
 }
@@ -208,7 +208,7 @@ int main(void){
     cudaMallocManaged(&v, nx*ny*sizeof(double));
     cudaMallocManaged(&p, nx*ny*sizeof(double));
     cudaMallocManaged(&b, nx*ny*sizeof(double));
-    cudaMallocManaged(&pn, nx*ny*sizeof(double));
+    //cudaMallocManaged(&pn, nx*ny*sizeof(double));
     cudaMallocManaged(&un, nx*ny*sizeof(double));
     cudaMallocManaged(&vn, nx*ny*sizeof(double));
     init_zero<<<nx,ny>>>(u,v,p,b);
