@@ -151,7 +151,7 @@ __global__ void data_insert_p(double *p, double *pn, double *b){
     }
 }
 
-__global__ void data_insert_u(double *u, double *un, double *vn){
+__global__ void data_insert_u(double *u, double *un, double *vn, double *p){
     int i = blockIdx.x;
     int j = threadIdx.x;
     if(i>0 && i<nx-1 && j>0 && j<ny-1){
@@ -164,7 +164,7 @@ __global__ void data_insert_u(double *u, double *un, double *vn){
     }
 }
 
-__global__ void data_insert_v(double *v, double *un, double *vn){
+__global__ void data_insert_v(double *v, double *un, double *vn, double *p){
     int i = blockIdx.x;
     int j = threadIdx.x;
     if(i>0 && i<nx-1 && j>0 && j<ny-1){
@@ -274,8 +274,8 @@ int main(void){
             }
         }
         */
-        data_insert_u<<<nx,ny>>>(u,un,vn);
-        data_insert_v<<<nx,ny>>>(v,un,vn);
+        data_insert_u<<<nx,ny>>>(u,un,vn,p);
+        data_insert_v<<<nx,ny>>>(v,un,vn,p);
         cudaDeviceSynchronize();
         border(u,v);
 
