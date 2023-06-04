@@ -20,6 +20,8 @@ const double dt = 0.01;
 const double rho = 1.0;
 const double nu = 0.02;
 
+double *u, *v, *p, *b, *pn, *un, *vn;
+
 #define u(y,x) u[(y)*ny + (x)]
 #define v(y,x) v[(y)*ny + (x)]
 #define p(y,x) p[(y)*ny + (x)]
@@ -194,7 +196,6 @@ int main(void){
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     */
-    double *u, *v, *p, *b, *pn, *un, *vn;
     initialize(u, v, p, b, pn, un, vn);
     std::chrono::steady_clock::time_point tic, toc;
     double time;
