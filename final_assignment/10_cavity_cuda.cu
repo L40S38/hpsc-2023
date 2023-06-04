@@ -27,13 +27,13 @@ const double nudt = nu * dt;
 const double dydy = dy * dy;
 const double dxdx = dx * dx;
 
-#define u(y,x) u[y*ny + x]
-#define v(y,x) v[y*ny + x]
-#define p(y,x) p[y*ny + x]
-#define b(y,x) b[y*ny + x]
-#define pn(y,x) pn[y*ny + x]
-#define un(y,x) un[y*ny + x]
-#define vn(y,x) vn[y*ny + x]
+#define u(y,x) u[(y)*ny + (x)]
+#define v(y,x) v[(y)*ny + (x)]
+#define p(y,x) p[(y)*ny + (x)]
+#define b(y,x) b[(y)*ny + (x)]
+#define pn(y,x) pn[(y)*ny + (x)]
+#define un(y,x) un[(y)*ny + (x)]
+#define vn(y,x) vn[(y)*ny + (x)]
 
 #define a(y,x) a[y*ny+x]
 #define an(y,x) an[y*ny+x]
