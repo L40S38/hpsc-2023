@@ -144,6 +144,7 @@ __global__ void data_insert_p(double *p, double *b){
     int i = blockIdx.x+1;
     int j = threadIdx.x+1;
     extern __shared__ double pn[];
+    #define pn(y,x) pn[(y)*ny + (x)]
     __syncthreads();
     pn(j,i) = p(j,i);
     __syncthreads();
