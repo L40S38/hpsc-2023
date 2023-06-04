@@ -194,6 +194,7 @@ int main(void){
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     */
+    //initialize(u, v, p, b, pn, un, vn);
     cudaMallocManaged(&u, nx*ny*sizeof(double));
     cudaMallocManaged(&v, nx*ny*sizeof(double));
     cudaMallocManaged(&p, nx*ny*sizeof(double));
@@ -203,7 +204,6 @@ int main(void){
     cudaMallocManaged(&vn, nx*ny*sizeof(double));
     init_zero<<<nx,ny>>>(u,v,p,b);
     cudaDeviceSynchronize();
-    initialize(u, v, p, b, pn, un, vn);
     std::chrono::steady_clock::time_point tic, toc;
     double time;
 
