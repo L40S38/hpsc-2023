@@ -151,7 +151,7 @@ __global__ void data_insert_p(double *p, double *pn, double *b){
     //}
 }
 
-__global__ void data_insert_u(double *u, double *un, double *vn, double *p){
+__global__ void data_insert_u_v(double *u, double *v, double *un, double *vn, double *p){
     int i = blockIdx.x+1;
     int j = threadIdx.x+1;
     //if(i>0 && i<nx-1 && j>0 && j<ny-1){
@@ -160,10 +160,14 @@ __global__ void data_insert_u(double *u, double *un, double *vn, double *p){
                                     dt / (2 * rho * dx) * (p(j,i+1) - p(j,i-1)) +
                                     nu * dt / (dx * dx) * (un(j,i+1) - 2 * un(j,i) + un(j,i-1)) +
                                     nu * dt / (dy * dy) * (un(j+1,i) - 2 * un(j,i) + un(j-1,i));
-                
+    v(j,i) = vn(j,i) - vn(j,i) * dt / dx * (vn(j,i) - vn(j,i-1)) -
+                                    vn(j,i) * dt / dy * (vn(j,i) - vn(j-1,i)) -
+                                    dt / (2 * rho * dx) * (p(j+1,i) - p(j-1,i)) +
+                                    nu * dt / (dx * dx) * (vn(j,i+1) - 2 * vn(j,i) + vn(j,i-1)) +
+                                    nu * dt / (dy * dy) * (vn(j+1,i) - 2 * vn(j,i) + vn(j-1,i));
     //}
 }
-
+/*
 __global__ void data_insert_v(double *v, double *un, double *vn, double *p){
     int i = blockIdx.x+1;
     int j = threadIdx.x+1;
@@ -175,6 +179,7 @@ __global__ void data_insert_v(double *v, double *un, double *vn, double *p){
                                     nu * dt / (dy * dy) * (vn(j+1,i) - 2 * vn(j,i) + vn(j-1,i));
     //}
 }
+*/
 
 int main(void){
     // x軸とy軸
@@ -282,8 +287,8 @@ int main(void){
             }
         }
         */
-        data_insert_u<<<nx-2,ny-2>>>(u,un,vn,p);
-        data_insert_v<<<nx-2,ny-2>>>(v,un,vn,p);
+        data_insert_u_v<<<nx-2,ny-2>>>(u,v,un,vn,p);
+        //data_insert_v<<<nx-2,ny-2>>>(v,un,vn,p);
         cudaDeviceSynchronize();
         border(u,v);
 
