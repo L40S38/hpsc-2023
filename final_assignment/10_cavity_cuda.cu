@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-
+#include <stdio.h>
 #include <chrono>
 
 // グローバル変数
