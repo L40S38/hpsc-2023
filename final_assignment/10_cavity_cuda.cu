@@ -121,16 +121,16 @@ void initialize(double *u, double *v, double *p, double *b,
 }
 
 __global__ void data_insert_b(double *b, double *u, double *v){
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    if(i>0 && i<nx-1 && j>0 && j<ny-1){
-        b(j,i) = rho * (1 / dt *
+    int i = blockIdx.x+1;
+    int j = threadIdx.x+1;
+    //if(i>0 && i<nx-1 && j>0 && j<ny-1){
+    b(j,i) = rho * (1 / dt *
             ((u(j,i+1) - u(j,i-1)) / (2 * dx) + (v(j+1,i) - v(j-1,i)) / (2 * dy)) -
             ((u(j,i+1) - u(j,i-1)) / (2 * dx)) * ((u(j,i+1) - u(j,i-1)) / (2 * dx)) -
             2 * ((u(j+1,i) - u(j-1,i)) / (2 * dy)) *
                 ((v(j,i+1) - v(j,i-1)) / (2 * dx)) -
             ((v(j+1,i) - v(j-1,i)) / (2 * dy)) * ((v(j+1,i) - v(j-1,i)) / (2 * dy)));
-    }
+    //}
 }
 
 __global__ void copy_array(double *an, double *a){
@@ -141,39 +141,39 @@ __global__ void copy_array(double *an, double *a){
 }
 
 __global__ void data_insert_p(double *p, double *pn, double *b){
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    if(i>0 && i<nx-1 && j>0 && j<ny-1){
-        p(j,i) = (dy * dy * (pn(j,i+1) + pn(j,i-1)) +
+    int i = blockIdx.x+1;
+    int j = threadIdx.x+1;
+    //if(i>0 && i<nx-1 && j>0 && j<ny-1){
+    p(j,i) = (dy * dy * (pn(j,i+1) + pn(j,i-1)) +
                 dx * dx * (pn(j+1,i) + pn(j-1,i)) -
                 b(j,i) * dx * dx * dy * dy) /
                 (2 * (dx * dx + dy * dy));
-    }
+    //}
 }
 
 __global__ void data_insert_u(double *u, double *un, double *vn, double *p){
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    if(i>0 && i<nx-1 && j>0 && j<ny-1){
-        u(j,i) = un(j,i) - un(j,i) * dt / dx * (un(j,i) - un(j,i-1)) -
+    int i = blockIdx.x+1;
+    int j = threadIdx.x+1;
+    //if(i>0 && i<nx-1 && j>0 && j<ny-1){
+    u(j,i) = un(j,i) - un(j,i) * dt / dx * (un(j,i) - un(j,i-1)) -
                                     un(j,i) * dt / dy * (un(j,i) - un(j-1,i)) -
                                     dt / (2 * rho * dx) * (p(j,i+1) - p(j,i-1)) +
                                     nu * dt / (dx * dx) * (un(j,i+1) - 2 * un(j,i) + un(j,i-1)) +
                                     nu * dt / (dy * dy) * (un(j+1,i) - 2 * un(j,i) + un(j-1,i));
                 
-    }
+    //}
 }
 
 __global__ void data_insert_v(double *v, double *un, double *vn, double *p){
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    if(i>0 && i<nx-1 && j>0 && j<ny-1){
-        v(j,i) = vn(j,i) - vn(j,i) * dt / dx * (vn(j,i) - vn(j,i-1)) -
+    int i = blockIdx.x+1;
+    int j = threadIdx.x+1;
+    //if(i>0 && i<nx-1 && j>0 && j<ny-1){
+    v(j,i) = vn(j,i) - vn(j,i) * dt / dx * (vn(j,i) - vn(j,i-1)) -
                                     vn(j,i) * dt / dy * (vn(j,i) - vn(j-1,i)) -
                                     dt / (2 * rho * dx) * (p(j+1,i) - p(j-1,i)) +
                                     nu * dt / (dx * dx) * (vn(j,i+1) - 2 * vn(j,i) + vn(j,i-1)) +
                                     nu * dt / (dy * dy) * (vn(j+1,i) - 2 * vn(j,i) + vn(j-1,i));
-    }
+    //}
 }
 
 int main(void){
@@ -226,7 +226,7 @@ int main(void){
             }
         }
         */
-        data_insert_b<<<nx,ny>>>(b,u,v);
+        data_insert_b<<<nx-2,ny-2>>>(b,u,v);
         cudaDeviceSynchronize();
         for(int it=0; it<nit; it++){
             //std::vector<std::vector<double>> pn = p;
@@ -242,7 +242,7 @@ int main(void){
                         (2 * (dx * dx + dy * dy));
                 }
             }*/
-            data_insert_p<<<nx,ny>>>(p,pn,b);
+            data_insert_p<<<nx-2,ny-2>>>(p,pn,b);
             cudaDeviceSynchronize();
             for (int i = 0; i < nx; i++) {
                 p(0,i) = p(1,i);
@@ -274,8 +274,8 @@ int main(void){
             }
         }
         */
-        data_insert_u<<<nx,ny>>>(u,un,vn,p);
-        data_insert_v<<<nx,ny>>>(v,un,vn,p);
+        data_insert_u<<<nx-2,ny-2>>>(u,un,vn,p);
+        data_insert_v<<<nx-2,ny-2>>>(v,un,vn,p);
         cudaDeviceSynchronize();
         border(u,v);
 
