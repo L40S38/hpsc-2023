@@ -122,6 +122,17 @@ void initialize(double *u, double *v, double *p, double *b,
     cudaDeviceSynchronize();
 }
 
+void free_memories(double *u, double *v, double *p, double *b, 
+                            double *pn, double *un, double *vn){
+    cudaFree(u);
+    cudaFree(v);
+    cudaFree(p);
+    cudaFree(b);
+    cudaFree(pn);
+    cudaFree(un);
+    cudaFree(vn);
+}
+
 __global__ void data_insert_b(double *b, double *u, double *v){
     int i = blockIdx.x+1;
     int j = threadIdx.x+1;
@@ -307,5 +318,7 @@ int main(void){
     // gnuplotパイプラインを閉じる
     pclose(gnuplotPipe);
 
+    //メモリを解放する
+    free_memories(u, v, p, b, pn, un, vn);
     return 0;
 }
