@@ -22,3 +22,5 @@ openacc:10_cavity_openacc.cpp
 	nvc++ 10_cavity_openacc.cpp -acc
 	nvc++ 10_cavity_openacc.cpp -acc -Minfo
 	./a.out
+qrsh:
+	qrsh -g tga-hpc-lecture -l f_node=1 -l h_rt=1:00:00

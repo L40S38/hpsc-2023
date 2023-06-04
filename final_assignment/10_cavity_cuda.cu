@@ -76,18 +76,18 @@ void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y
 }
 
 //境界条件
-void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v) {
+void border(double *u, double *v) {
     for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 1.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
+        u(0,i) = 0.0;
+        u(ny - 1,i) = 1.0;
+        v(0,i) = 0.0;
+        v(ny - 1,i) = 0.0;
     }
     for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
+        u(i,0) = 0.0;
+        u(i,nx - 1) = 0.0;
+        v(i,0) = 0.0;
+        v(i,nx - 1) = 0.0;
     }
 }
 
