@@ -110,7 +110,7 @@ __global__ void init_zero(double *u, double *v, double *p, double *b){
 }
 
 void free_memories(double *u, double *v, double *p, double *b, 
-                            double *pn, double *un, double *vn){
+                            double *un, double *vn){
     cudaFree(u);
     cudaFree(v);
     cudaFree(p);
@@ -325,6 +325,6 @@ int main(void){
     pclose(gnuplotPipe);
 
     //メモリを解放する
-    free_memories(u, v, p, b, pn, un, vn);
+    free_memories(u, v, p, b, un, vn);
     return 0;
 }
