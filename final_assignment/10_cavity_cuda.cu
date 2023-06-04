@@ -140,9 +140,13 @@ __global__ void copy_array(double *an, double *a){
     an(j,i) = a(j,i);
 }
 
-__global__ void data_insert_p(double *p, double *pn, double *b){
+__global__ void data_insert_p(double *p, double *b){
     int i = blockIdx.x+1;
     int j = threadIdx.x+1;
+    extern __shared__ double pn[];
+    __syncthreads();
+    pn(j,i) = p(i);
+    __syncthreads();
     //if(i>0 && i<nx-1 && j>0 && j<ny-1){
     p(j,i) = (dy * dy * (pn(j,i+1) + pn(j,i-1)) +
                 dx * dx * (pn(j+1,i) + pn(j-1,i)) -
@@ -243,8 +247,8 @@ int main(void){
         cudaDeviceSynchronize();
         for(int it=0; it<nit; it++){
             //std::vector<std::vector<double>> pn = p;
-            copy_array<<<nx,ny>>>(pn,p);
-            cudaDeviceSynchronize();
+            //copy_array<<<nx,ny>>>(pn,p);
+            //cudaDeviceSynchronize();
             /*
             for(int j=1; j<ny-1; j++){
                 for(int i=1; i<nx-1; i++){
@@ -255,7 +259,7 @@ int main(void){
                         (2 * (dx * dx + dy * dy));
                 }
             }*/
-            data_insert_p<<<nx-2,ny-2>>>(p,pn,b);
+            data_insert_p<<<nx-2,ny-2>>>(p,b);
             cudaDeviceSynchronize();
             for (int i = 0; i < nx; i++) {
                 p(0,i) = p(1,i);
