@@ -8,8 +8,6 @@
 
 #include <chrono>
 
-#define b(y,x)
-
 // グローバル変数
 const int nx = 41;
 const int ny = 41;
