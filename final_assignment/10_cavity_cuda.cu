@@ -109,19 +109,6 @@ __global__ void init_zero(double *u, double *v, double *p, double *b){
     b[i] = 0.0;
 }
 
-void initialize(double *u, double *v, double *p, double *b, 
-                            double *pn, double *un, double *vn){
-    cudaMallocManaged(&u, nx*ny*sizeof(double));
-    cudaMallocManaged(&v, nx*ny*sizeof(double));
-    cudaMallocManaged(&p, nx*ny*sizeof(double));
-    cudaMallocManaged(&b, nx*ny*sizeof(double));
-    cudaMallocManaged(&pn, nx*ny*sizeof(double));
-    cudaMallocManaged(&un, nx*ny*sizeof(double));
-    cudaMallocManaged(&vn, nx*ny*sizeof(double));
-    init_zero<<<nx,ny>>>(u,v,p,b);
-    cudaDeviceSynchronize();
-}
-
 void free_memories(double *u, double *v, double *p, double *b, 
                             double *pn, double *un, double *vn){
     cudaFree(u);
@@ -207,6 +194,15 @@ int main(void){
     std::vector<std::vector<double>> p(ny, std::vector<double>(nx));
     std::vector<std::vector<double>> b(ny, std::vector<double>(nx));
     */
+    cudaMallocManaged(&u, nx*ny*sizeof(double));
+    cudaMallocManaged(&v, nx*ny*sizeof(double));
+    cudaMallocManaged(&p, nx*ny*sizeof(double));
+    cudaMallocManaged(&b, nx*ny*sizeof(double));
+    cudaMallocManaged(&pn, nx*ny*sizeof(double));
+    cudaMallocManaged(&un, nx*ny*sizeof(double));
+    cudaMallocManaged(&vn, nx*ny*sizeof(double));
+    init_zero<<<nx,ny>>>(u,v,p,b);
+    cudaDeviceSynchronize();
     initialize(u, v, p, b, pn, un, vn);
     std::chrono::steady_clock::time_point tic, toc;
     double time;
