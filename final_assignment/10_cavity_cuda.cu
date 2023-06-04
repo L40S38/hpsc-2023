@@ -145,7 +145,7 @@ __global__ void data_insert_p(double *p, double *b){
     int j = threadIdx.x+1;
     extern __shared__ double pn[];
     __syncthreads();
-    pn(j,i) = p(i);
+    pn(j,i) = p(j,i);
     __syncthreads();
     //if(i>0 && i<nx-1 && j>0 && j<ny-1){
     p(j,i) = (dy * dy * (pn(j,i+1) + pn(j,i-1)) +
