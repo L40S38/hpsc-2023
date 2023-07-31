@@ -13,6 +13,7 @@
 const int nx = 41;
 const int ny = 41;
 const int nt = 500;
+//const int nt = 10;
 const int nit = 50;
 const double dx = 2.0 / (nx - 1);
 const double dy = 2.0 / (ny - 1);
@@ -24,7 +25,6 @@ const double rhodx2 = 2 * rho * dx;
 const double nudt = nu * dt;
 const double dydy = dy * dy;
 const double dxdx = dx * dx;
-
 
 // プロットデータをファイルに保存する関数
 void sendDataPressure(const std::vector<double>& x, const std::vector<double>& y,
@@ -64,14 +64,12 @@ void sendDataVerocity(const std::vector<double>& x, const std::vector<double>& y
 
 //境界条件
 void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v) {
-#pragma acc parallel
     for (int i = 0; i < nx; i++) {
         u[0][i] = 0.0;
         u[ny - 1][i] = 1.0;
         v[0][i] = 0.0;
         v[ny - 1][i] = 0.0;
     }
-#pragma acc parallel
     for (int i = 0; i < ny; i++) {
         u[i][0] = 0.0;
         u[i][nx - 1] = 0.0;
@@ -83,7 +81,6 @@ void border(std::vector<std::vector<double>>& u, std::vector<std::vector<double>
 // 初期条件の設定
 void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<double>>& v,
                 std::vector<std::vector<double>>& p, std::vector<std::vector<double>>& b) {
-#pragma acc parallel
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
             u[i][j] = 0.0;
@@ -92,31 +89,15 @@ void initialize(std::vector<std::vector<double>>& u, std::vector<std::vector<dou
             b[i][j] = 0.0;
         }
     }
-#pragma acc parallel
-    for (int i = 0; i < nx; i++) {
-        u[0][i] = 0.0;
-        u[ny - 1][i] = 0.0;
-        v[0][i] = 0.0;
-        v[ny - 1][i] = 0.0;
-    }
-#pragma acc parallel
-    for (int i = 0; i < ny; i++) {
-        u[i][0] = 0.0;
-        u[i][nx - 1] = 0.0;
-        v[i][0] = 0.0;
-        v[i][nx - 1] = 0.0;
-    }
 }
 
 int main(void){
     // x軸とy軸
     std::vector<double> x(nx);
     std::vector<double> y(ny);
-#pragma acc parallel
     for (int i = 0; i < nx; i++) {
         x[i] = i * dx;
     }
-#pragma acc parallel
     for (int i = 0; i < ny; i++) {
         y[i] = i * dy;
     }
@@ -145,8 +126,10 @@ int main(void){
     for(int n=0; n<nt; n++){
         //タイム計測
         toc = std::chrono::steady_clock::now();
-#pragma acc parallel
+#pragma acc kernels
+#pragma acc loop independent
         for(int j=1; j<ny-1; j++){
+#pragma acc loop independent
             for(int i=1; i<nx-1; i++){
                 b[j][i] = rho * (1 / dt *
                                  ((u[j][i+1] - u[j][i-1]) / (2 * dx) + (v[j+1][i] - v[j-1][i]) / (2 * dy)) -
@@ -156,16 +139,18 @@ int main(void){
                                  ((v[j+1][i] - v[j-1][i]) / (2 * dy)) * ((v[j+1][i] - v[j-1][i]) / (2 * dy)));
             }
         }
-#pragma acc parallel
         for(int it=0; it<nit; it++){
             std::vector<std::vector<double>> pn = p;
+//#pragma acc kernels
+//#pragma acc loop independent
             for(int j=1; j<ny-1; j++){
+//#pragma acc loop independent
                 for(int i=1; i<nx-1; i++){
                     p[j][i] =
-                        (dydy * (pn[j][i+1] + pn[j][i-1]) +
-                         dxdx * (pn[j+1][i] + pn[j-1][i]) -
-                         b[j][i] * dxdx * dydy) /
-                        (2 * (dxdx + dydy));
+                        (dy * dy * (pn[j][i+1] + pn[j][i-1]) +
+                         dx * dx * (pn[j+1][i] + pn[j-1][i]) -
+                         b[j][i] * dx * dx * dy * dy) /
+                        (2 * (dx * dx + dy * dy));
                 }
             }
             for (int i = 0; i < nx; i++) {
@@ -179,25 +164,29 @@ int main(void){
         }
         std::vector<std::vector<double>> un = u;
         std::vector<std::vector<double>> vn = v;
-#pragma acc parallel
+#pragma acc kernels
+#pragma acc loop independent
         for (int j=1; j<ny-1; j++) {
+#pragma acc loop independent
             for (int i=1; i<nx-1; i++) {
                 u[j][i] = un[j][i] - un[j][i] * dt / dx * (un[j][i] - un[j][i-1]) -
                                     un[j][i] * dt / dy * (un[j][i] - un[j-1][i]) -
-                                    dt / (rhodx2) * (p[j][i+1] - p[j][i-1]) +
-                                    nudt / (dxdx) * (un[j][i+1] - 2 * un[j][i] + un[j][i-1]) +
-                                    nudt / (dydy) * (un[j+1][i] - 2 * un[j][i] + un[j-1][i]);
+                                    dt / (2 * rho * dx) * (p[j][i+1] - p[j][i-1]) +
+                                    nu * dt / (dx * dx) * (un[j][i+1] - 2 * un[j][i] + un[j][i-1]) +
+                                    nu * dt / (dy * dy) * (un[j+1][i] - 2 * un[j][i] + un[j-1][i]);
                 v[j][i] = vn[j][i] - vn[j][i] * dt / dx * (vn[j][i] - vn[j][i-1]) -
                                     vn[j][i] * dt / dy * (vn[j][i] - vn[j-1][i]) -
-                                    dt / (rhodx2) * (p[j+1][i] - p[j-1][i]) +
-                                    nudt / (dxdx) * (vn[j][i+1] - 2 * vn[j][i] + vn[j][i-1]) +
-                                    nudt / (dydy) * (vn[j+1][i] - 2 * vn[j][i] + vn[j-1][i]);
-                /*
-                2 * rho * dx, nu * dt, dy * dy, dx * dx は先に計算しておいた方が良さそう
-                */
+                                    dt / (2 * rho * dx) * (p[j+1][i] - p[j-1][i]) +
+                                    nu * dt / (dx * dx) * (vn[j][i+1] - 2 * vn[j][i] + vn[j][i-1]) +
+                                    nu * dt / (dy * dy) * (vn[j+1][i] - 2 * vn[j][i] + vn[j-1][i]);
             }
         }
         border(u,v);
+
+        // 時間計測, gnuplotの部分は除外
+        tic = std::chrono::steady_clock::now();
+        time = std::chrono::duration<double>(tic-toc).count();
+        std::cout << n + 1 << "," << time << std::endl;
 
         // gnuplotにプロットコマンドを送信
         fprintf(gnuplotPipe, "set title 'Pressure'\n");
@@ -216,11 +205,6 @@ int main(void){
         fprintf(gnuplotPipe, "pause .01\n");
         fprintf(gnuplotPipe, "\n\n");
         fflush(gnuplotPipe);
-
-        // 時間計測
-        tic = std::chrono::steady_clock::now();
-        time = std::chrono::duration<double>(tic-toc).count();
-        std::cout << n + 1 << "," << time << std::endl;
     }
 
     // gnuplotパイプラインを閉じる
